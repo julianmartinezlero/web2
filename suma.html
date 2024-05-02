@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body{
+      width: 100%;
+      height: 100%;
+      top: 0;
+      bottom: 0;
+      background-color: white;
+      margin: 0 !important;
+      position: absolute;
+      display: grid;
+      align-content: center;
+      align-items: center;
+    }
+    .calculadora{
+      width: 300px;
+      margin: auto;
+      height: 400px;
+    }
+    .ventana{
+      /*background-color: #cfcfcf;*/
+    }
+    .ventana>input{
+      width: calc(100% - 12px);
+      margin: 8px 0px 8px 0px;
+      padding-block: 0;
+      padding-inline: 0;
+      border-width: 0;
+      background: white;
+      height: 2.5em;
+      border: solid 1px #dfdfdf;
+      text-align: end;
+      padding: 5px;
+    }
+    .botones{
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+    .botones > button {
+      width: calc(calc(100% / 4) - 3px);
+      margin: 0;
+      padding: 0;
+      border: 0;
+      padding-inline: 0;
+      padding-block: 0;
+      cursor: pointer;
+      height: 30px;
+    }
+
+    .botones > button:hover:not(:disabled) {
+      background-color: #cfcfcf;
+    }
+
+    button.hover-btn {
+      background-color: #cfcfcf;
+
+    }
+    .history{
+      background-color: gray;
+    }
+
+    .history .item {
+      display: block;
+      padding: 5px;
+      margin: 4px 2px;
+      background-color: #eeeeee;
+      width: 80px;
+      text-align: end;
+    }
+
+  </style>
+</head>
+<body id="app">
+  <div class="calculadora">
+    <p>Calculadora</p>
+
+    <div class="ventana">
+      <input type="text" id="aCalcular" disabled>
+    </div>
+    <div class="botones">
+      <button type="button" tabindex="-1" value="1">1</button>
+      <button type="button" tabindex="-1" value="2">2</button>
+      <button type="button" tabindex="-1" value="3">3</button>
+      <button type="button" tabindex="-1" value="+">+</button>
+      <button type="button" tabindex="-1" value="4">4</button>
+      <button type="button" tabindex="-1" value="5">5</button>
+      <button type="button" tabindex="-1" value="6">6</button>
+      <button type="button" tabindex="-1" value="-">-</button>
+      <button type="button" tabindex="-1" value="7">7</button>
+      <button type="button" tabindex="-1" value="8">8</button>
+      <button type="button" tabindex="-1" value="9">9</button>
+      <button type="button" tabindex="-1" value="&times;">&times;</button>
+      <button type="button" tabindex="-1" disabled>C</button>
+      <button type="button" tabindex="-1" value="0">0</button>
+      <button type="button" tabindex="-1" value="=">=</button>
+      <button type="button" tabindex="-1" value="/">/</button>
+
+    </div>
+    <div class="history" id="history">
+      <!-- <div class="item">5+5=10</div> -->
+    </div>
+
+  </div>
+  <div>
+    <button onclick="guardarDato()">guardar</button>
+    <button onclick="leerDato()">leer</button>
+  </div>
+  <script>
+
+    const buttons = document.getElementsByTagName('button')
+    const aCalcular = document.getElementById("aCalcular")
+    let historial = []
+
+    const body = document.body;
+
+    for(let i = 0; i < buttons.length; i++) {
+      buttons.item(i).addEventListener('click', e => {
+        if (e.target.value == '=') {
+          // aCalcular.value = aCalcular.value + e.target.innerText
+          console.log("calculando")
+        } else {
+          aCalcular.value = aCalcular.value + e.target.innerText
+        }
+      })
+    }
+
+
+    body.addEventListener('keyup', e => {
+      console.log(e);
+
+      
+      if (e.keyCode == 187)
+        pressButton(e.key)
+
+
+
+      if (e.keyCode == 189)
+        pressButton(e.key)
+
+      
+      if (e.keyCode == 56)
+        pressButton(e.key)
+
+      
+      if (e.keyCode == 191)
+        pressButton(e.key)
+
+      // validamos si son numeros
+      if (e.keyCode>=48 && e.keyCode<=57) {
+        console.log(e.key);
+        pressButton(e.key)
+      }
+
+      if (e.keyCode == 13) {
+        // solucionado
+        pressButton('=')
+        evaluarOpeacion()
+
+      }
+
+      if (e.keyCode == 8) {
+        aCalcular.value = aCalcular.value.substring(0, aCalcular.value.length - 1)
+      }
+    })
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log("cargadpo")
+      leerDato();
+      redenHistory()
+    })
+
+    function pressButton(key) {
+      for(let i = 0; i < buttons.length; i++) {
+        const a = buttons.item(i);
+        if (key == a.value) {
+          a.click()
+          a.classList.add('hover-btn')
+          setTimeout(() => {
+            a.classList.remove('hover-btn')
+          }, 100)
+        }
+      }
+    }
+
+
+    function evaluarOpeacion() {
+      // aEvaluar es ej: 5+5
+      const aEvaluar = aCalcular.value;
+      // const historia = aEvaluar;
+
+      if (aEvaluar.split("+").length >1) {
+        aCalcular.value = sumar(aEvaluar)
+      }
+     if (aEvaluar.split("-").length > 1) {
+      aCalcular.value = restar(aEvaluar)
+      }
+      historial.push(aEvaluar + "=" + aCalcular.value)
+      guardarDato(historial)
+      redenHistory()
+ /*      if (aEvaluar.split("/").length >1) {
+        dividir(aEvaluar)
+      }
+      if (aEvaluar.split("×").length >1) {
+        multiplicar(aEvaluar)
+      }
+      */
+    }
+
+    // recibe una cadena 5+5
+    function sumar(operaCadena) {
+      const a = operaCadena.split("+")
+      return Number(a[0]) + Number(a[1])
+    }
+
+    function restar(operaCadena) {
+      const a = operaCadena.split("-")
+      return Number(a[0]) - Number(a[1])
+    }
+    
+
+    function redenHistory() {
+      
+      clearHistory()
+
+      // div con id="history"
+
+      const h = document.getElementById("history")
+        // historial es un arreglo de cadenas
+      // const historial = ['5+5=10', '15-5=10']
+
+      for( let i = 0; i < historial.length; i++) {
+        const item = document.createElement("div");
+        item.classList.add("item")
+        item.innerText = historial[i]
+        // agregamos item dentro de div history
+        h.appendChild(item)
+      }
+    }
+
+
+    function clearHistory() {
+      const h = document.getElementById("history")
+      let item = h.firstElementChild
+
+      while (item) {
+        h.removeChild(item)
+        item = h.firstElementChild
+      }
+    }
+
+
+
+    // historial = ["10+10=20", "20+1=21"]
+    function guardarDato(historial = ["10+10=20", "20+1=21"]) {
+      localStorage.setItem("resultados", JSON.stringify(historial))
+    }
+
+    function leerDato() {
+      const tareas = localStorage.getItem('resultados')
+      if (tareas) {
+        historial = JSON.parse(tareas)
+        console.log(historial)
+      } else {
+        historial = []
+    }
+     
+
+    }
+
+    function eliminarDato() {
+      localStorage.removeItem("tareas")
+      sessionStorage.removeItem("tareas")
+    }
+    /*
+    localStorage.clear() // limpia todo
+    localStorage.key(0) // retorna nombre de llave en una posicion
+    localStorage.setItem(key, valor) // inserta una valor
+    localStorage.getItem(key) // retorna un valor
+    localStorage.removeItem(key) // elimina un valor
+    localStorage.length // cantidad de llaves
+    */
+
+  </script>
+</body>
+</html>

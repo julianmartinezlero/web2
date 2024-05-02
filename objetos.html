@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <form action="" id="formulario">
+    <label for="correo">Correo</label>
+    <input type="text" id="correo">
+
+    <label for="nombre">Nombre</label>
+    <input type="text" id="nombre">
+
+    <button type="submit">Guardar</button>
+    
+  </form>
+</head>
+<body>
+
+  <script>
+
+    const personas = []
+
+    document.getElementById("formulario").addEventListener('submit', e => {
+      // evitamos el comportamiento por defecto
+      e.preventDefault()
+      const correo = document.getElementById("correo")
+      const nombre = document.getElementById("nombre")
+      
+      const persona = {
+        nombre: nombre.value,
+        corre: correo.value
+      }
+
+      personas.push(persona)
+      
+      console.log(personas)
+
+      correo.value = null
+      nombre.value = null      
+    })
+
+  </script>
+  
+</body>
+</html>
